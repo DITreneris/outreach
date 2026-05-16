@@ -5,9 +5,9 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# Omit startCommand — use Dockerfile CMD (shell expands $PORT)
-healthcheckPath = "/health"
-healthcheckTimeout = 120
+# Use Dockerfile ENTRYPOINT only — clear any custom Start Command in Railway UI
+healthcheckPath = "/"
+healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 
 # API service (default): uvicorn cpb_outreach.api.main:app

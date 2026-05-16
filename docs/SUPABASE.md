@@ -27,6 +27,13 @@ npx supabase@latest link --project-ref ncoxilxwjrjbtipfcngr
 npx supabase@latest db push
 ```
 
+## Railway deploy troubleshooting
+
+1. **Settings → Deploy → Start Command** must be **empty** (use Dockerfile `ENTRYPOINT`).
+2. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (or publishable for smoke test).
+3. After deploy, open `https://<app>.up.railway.app/` — expect `{"status":"up"}`.
+4. If healthcheck fails: check **Deploy Logs** for `cpb-outreach: starting uvicorn on 0.0.0.0:...`
+
 ## Security
 
 - Never commit `.env` or the **service_role** key.

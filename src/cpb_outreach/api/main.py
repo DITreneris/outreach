@@ -11,6 +11,11 @@ from cpb_outreach.unsubscribe_tokens import verify_unsubscribe_token
 app = FastAPI(title="CPB School Outreach", version="0.1.0")
 
 
+@app.get("/")
+def root() -> dict:
+    return {"service": "cpb-school-outreach", "status": "up"}
+
+
 @app.get("/health")
 def health() -> dict:
     settings = get_settings()
