@@ -1,0 +1,14 @@
+# https://docs.railway.app/reference/config-as-code
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+
+# API service (default): uvicorn cpb_outreach.api.main:app
+# Worker service: set start command in Railway dashboard to:
+#   python -m cpb_outreach.worker.run_send
+# Cron example (Railway cron): 0 14 * * 1-5  (weekdays 2pm UTC)

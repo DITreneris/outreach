@@ -1,0 +1,38 @@
+[project]
+name = "cpb-school-outreach"
+version = "0.1.0"
+description = "K-12 school outreach for Classroom Prompt Builder (Supabase + Railway + Resend)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.32.0",
+  "supabase>=2.10.0",
+  "resend>=2.4.0",
+  "httpx>=0.27.0",
+  "pydantic>=2.9.0",
+  "pydantic-settings>=2.6.0",
+  "python-dotenv>=1.0.0",
+  "pandas>=2.2.0",
+  "rapidfuzz>=3.10.0",
+  "beautifulsoup4>=4.12.0",
+  "dnspython>=2.7.0",
+  "click>=8.1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0", "httpx>=0.27.0"]
+
+[project.scripts]
+cpb-outreach = "cpb_outreach.cli:cli"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

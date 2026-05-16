@@ -1,0 +1,2 @@
+-- Run manually after warmup + main-repo P0 E2E (do not auto-run in CI)
+-- update campaigns set dry_run = false, status = 'active' where slug = 'pilot_50';
