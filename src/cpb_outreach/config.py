@@ -1,13 +1,28 @@
 from functools import lru_cache
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    supabase_url: str = ""
+    supabase_url: str = Field(
+        default="",
+        validation_alias=AliasChoices("SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL"),
+    )
     supabase_service_role_key: str = ""
+    supabase_publishable_key: str = Field(
+        default="",
+        validation_alias=AliasChoices(
+            "SUPABASE_PUBLISHABLE_KEY",
+            "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+        ),
+    )
+
+    def supabase_api_key(self) -> str:
+        """Prefer service role for Railway; fall back to publishable for local dev only."""
+        return self.supabase_service_role_key or self.supabase_publishable_key
 
     resend_api_key: str = ""
     resend_webhook_secret: str = ""

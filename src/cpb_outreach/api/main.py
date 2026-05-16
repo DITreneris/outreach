@@ -14,7 +14,7 @@ app = FastAPI(title="CPB School Outreach", version="0.1.0")
 @app.get("/health")
 def health() -> dict:
     settings = get_settings()
-    ok = bool(settings.supabase_url and settings.supabase_service_role_key)
+    ok = bool(settings.supabase_url and settings.supabase_api_key())
     return {"ok": ok, "service": "cpb-school-outreach"}
 
 

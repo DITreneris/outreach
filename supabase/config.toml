@@ -1,5 +1,6 @@
-# Minimal Supabase CLI config (link with: supabase link --project-ref YOUR_REF)
-project_id = "cpb-school-outreach"
+# Linked project: ncoxilxwjrjbtipfcngr
+# CLI: supabase link --project-ref ncoxilxwjrjbtipfcngr
+project_id = "ncoxilxwjrjbtipfcngr"
 
 [db]
 major_version = 15
