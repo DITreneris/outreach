@@ -27,6 +27,18 @@ npx supabase@latest link --project-ref ncoxilxwjrjbtipfcngr
 npx supabase@latest db push
 ```
 
+## Import 500 contacts (local CLI only)
+
+Use **service_role** in `.env`. Full steps: [`data/README.md`](../data/README.md).
+
+```powershell
+cpb-outreach merge-nces --nces-csv data\nces_raw\schools.csv --school-pool 750
+cpb-outreach import-schools --csv data\schools_master.csv
+cpb-outreach enrich-contacts --target 500 --school-batch 50
+```
+
+Campaign `pilot_50` stays `dry_run = true` until you explicitly go live.
+
 ## Railway deploy troubleshooting
 
 1. **Settings → Deploy → Start Command** must be **empty** (use Dockerfile `ENTRYPOINT`).

@@ -32,11 +32,17 @@ uvicorn cpb_outreach.api.main:app --reload
 ## CLI
 
 ```bash
-cpb-outreach merge-nces --nces-csv data/sample_nces.csv --rankings-csv data/sample_rankings.csv --top-n 2
+# 500 contacts pipeline (High + Open + WEBSITE, 750 school pool)
+cpb-outreach merge-nces --nces-csv data/nces_raw/schools.csv --school-pool 750
 cpb-outreach import-schools --csv data/schools_master.csv
-cpb-outreach enrich-contacts --limit 50
+cpb-outreach enrich-contacts --target 500 --school-batch 50
+
+# Samples
+cpb-outreach merge-nces --nces-csv data/sample_nces.csv --school-pool 2 --level "" --no-dedupe-domain
 cpb-outreach send-pilot --slug pilot_50 --limit 50
 ```
+
+Windows: `.\scripts\run_import_500.ps1` after `pip install -e .` and `SUPABASE_SERVICE_ROLE_KEY` in `.env`.
 
 Pilot campaign starts with `dry_run = true` in seed SQL. Set `dry_run = false` only after Resend domain warmup and main-repo P0 test-mode E2E.
 

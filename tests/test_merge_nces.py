@@ -9,7 +9,10 @@ def test_build_master_with_rankings():
     df = build_master(
         DATA / "sample_nces.csv",
         DATA / "sample_rankings.csv",
-        top_n=10,
+        school_pool=10,
+        level=None,
+        open_only=False,
+        dedupe_domain=False,
     )
     assert len(df) == 2
     assert "us_news_rank" in df.columns
