@@ -42,8 +42,10 @@ Pilot campaign starts with `dry_run = true` in seed SQL. Set `dry_run = false` o
 
 ## Railway
 
+Deploy uses **Dockerfile** (avoids Nixpacks `$NIXPACKS_PATH` build issues).
+
 1. New project → deploy from this repo.
-2. **API service** start: `uvicorn cpb_outreach.api.main:app --host 0.0.0.0 --port $PORT`
+2. **API service** start (set in `railway.toml`): `uvicorn cpb_outreach.api.main:app --host 0.0.0.0 --port $PORT`
 3. **Worker service** (optional cron): `python -m cpb_outreach.worker.run_send`
 4. Set all vars from [`.env.example`](.env.example).
 5. Resend webhook: `POST https://<railway>/webhooks/resend` — see [docs/RESEND_MARKETING_SETUP.md](docs/RESEND_MARKETING_SETUP.md).

@@ -1,3 +1,0 @@
-# Ensure src-layout package is installed (Railway / Nixpacks)
-[phases.install]
-cmds = ["pip install ."]

@@ -1,8 +1,8 @@
 # https://docs.railway.app/reference/config-as-code
 
 [build]
-builder = "NIXPACKS"
-buildCommand = "pip install ."
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "uvicorn cpb_outreach.api.main:app --host 0.0.0.0 --port $PORT"
