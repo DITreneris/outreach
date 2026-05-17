@@ -52,11 +52,16 @@ def send_self_test(
     _verify_internal_key(x_api_key)
     from cpb_outreach.sender import send_self_test as send_operator_self_test
 
-    return send_operator_self_test(
-        payload.email,
-        campaign_slug=slug,
-        contact_name=payload.contact_name,
-    )
+    try:
+        return send_operator_self_test(
+            payload.email,
+            campaign_slug=slug,
+            contact_name=payload.contact_name,
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}")
 
 
 @app.post("/webhooks/resend")
