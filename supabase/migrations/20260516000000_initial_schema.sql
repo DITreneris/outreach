@@ -1,42 +1,51 @@
 -- Classroom Prompt Builder — school outreach (isolated from Vercel fulfillment)
+-- Idempotent: safe to re-run on preview branches and existing prod DBs.
 
 create extension if not exists "pgcrypto";
 
-create type suppression_reason as enum (
-  'hard_bounce',
-  'complaint',
-  'unsubscribe',
-  'soft_bounce',
-  'manual'
-);
+do $$ begin
+  create type suppression_reason as enum (
+    'hard_bounce',
+    'complaint',
+    'unsubscribe',
+    'soft_bounce',
+    'manual'
+  );
+exception when duplicate_object then null; end $$;
 
-create type contact_role as enum (
-  'principal',
-  'instructional_coach',
-  'media_specialist',
-  'generic_office',
-  'other'
-);
+do $$ begin
+  create type contact_role as enum (
+    'principal',
+    'instructional_coach',
+    'media_specialist',
+    'generic_office',
+    'other'
+  );
+exception when duplicate_object then null; end $$;
 
-create type outreach_status as enum (
-  'pending',
-  'ready',
-  'sent',
-  'bounced',
-  'complained',
-  'opted_out',
-  'replied',
-  'skipped'
-);
+do $$ begin
+  create type outreach_status as enum (
+    'pending',
+    'ready',
+    'sent',
+    'bounced',
+    'complained',
+    'opted_out',
+    'replied',
+    'skipped'
+  );
+exception when duplicate_object then null; end $$;
 
-create type campaign_status as enum (
-  'draft',
-  'active',
-  'paused',
-  'completed'
-);
+do $$ begin
+  create type campaign_status as enum (
+    'draft',
+    'active',
+    'paused',
+    'completed'
+  );
+exception when duplicate_object then null; end $$;
 
-create table schools (
+create table if not exists schools (
   id uuid primary key default gen_random_uuid(),
   nces_id text unique,
   us_news_rank int,
@@ -53,10 +62,10 @@ create table schools (
   updated_at timestamptz not null default now()
 );
 
-create index schools_state_idx on schools (state);
-create index schools_rank_idx on schools (us_news_rank) where us_news_rank is not null;
+create index if not exists schools_state_idx on schools (state);
+create index if not exists schools_rank_idx on schools (us_news_rank) where us_news_rank is not null;
 
-create table contacts (
+create table if not exists contacts (
   id uuid primary key default gen_random_uuid(),
   school_id uuid references schools (id) on delete set null,
   email text not null unique,
@@ -70,10 +79,10 @@ create table contacts (
   updated_at timestamptz not null default now()
 );
 
-create index contacts_school_id_idx on contacts (school_id);
-create index contacts_outreach_status_idx on contacts (outreach_status);
+create index if not exists contacts_school_id_idx on contacts (school_id);
+create index if not exists contacts_outreach_status_idx on contacts (outreach_status);
 
-create table suppressions (
+create table if not exists suppressions (
   id uuid primary key default gen_random_uuid(),
   email text not null unique,
   reason suppression_reason not null,
@@ -81,9 +90,9 @@ create table suppressions (
   created_at timestamptz not null default now()
 );
 
-create index suppressions_reason_idx on suppressions (reason);
+create index if not exists suppressions_reason_idx on suppressions (reason);
 
-create table campaigns (
+create table if not exists campaigns (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique,
   name text not null,
@@ -97,7 +106,7 @@ create table campaigns (
   updated_at timestamptz not null default now()
 );
 
-create table send_log (
+create table if not exists send_log (
   id uuid primary key default gen_random_uuid(),
   contact_id uuid not null references contacts (id) on delete cascade,
   campaign_id uuid not null references campaigns (id) on delete cascade,
@@ -109,8 +118,8 @@ create table send_log (
   constraint send_log_contact_campaign unique (contact_id, campaign_id)
 );
 
-create index send_log_campaign_id_idx on send_log (campaign_id);
-create index send_log_resend_message_id_idx on send_log (resend_message_id) where resend_message_id is not null;
+create index if not exists send_log_campaign_id_idx on send_log (campaign_id);
+create index if not exists send_log_resend_message_id_idx on send_log (resend_message_id) where resend_message_id is not null;
 
 create or replace function set_updated_at()
 returns trigger as $$
@@ -120,12 +129,15 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists schools_updated_at on schools;
 create trigger schools_updated_at before update on schools
   for each row execute function set_updated_at();
 
+drop trigger if exists contacts_updated_at on contacts;
 create trigger contacts_updated_at before update on contacts
   for each row execute function set_updated_at();
 
+drop trigger if exists campaigns_updated_at on campaigns;
 create trigger campaigns_updated_at before update on campaigns
   for each row execute function set_updated_at();
 
@@ -136,8 +148,17 @@ alter table suppressions enable row level security;
 alter table campaigns enable row level security;
 alter table send_log enable row level security;
 
+drop policy if exists service_role_all_schools on schools;
 create policy service_role_all_schools on schools for all using (true) with check (true);
+
+drop policy if exists service_role_all_contacts on contacts;
 create policy service_role_all_contacts on contacts for all using (true) with check (true);
+
+drop policy if exists service_role_all_suppressions on suppressions;
 create policy service_role_all_suppressions on suppressions for all using (true) with check (true);
+
+drop policy if exists service_role_all_campaigns on campaigns;
 create policy service_role_all_campaigns on campaigns for all using (true) with check (true);
+
+drop policy if exists service_role_all_send_log on send_log;
 create policy service_role_all_send_log on send_log for all using (true) with check (true);
