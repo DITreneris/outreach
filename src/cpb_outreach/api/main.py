@@ -2,6 +2,7 @@ import json
 
 from fastapi import FastAPI, Header, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, PlainTextResponse
+from pydantic import BaseModel
 
 from cpb_outreach.config import get_settings
 from cpb_outreach.db import get_supabase, normalize_email
@@ -9,6 +10,11 @@ from cpb_outreach.suppressions import suppress_email
 from cpb_outreach.unsubscribe_tokens import verify_unsubscribe_token
 
 app = FastAPI(title="CPB School Outreach", version="0.1.0")
+
+
+class SelfTestRequest(BaseModel):
+    email: str
+    contact_name: str | None = "Tomas"
 
 
 @app.get("/")
@@ -35,6 +41,22 @@ def send_batch(slug: str, limit: int | None = None, x_api_key: str | None = Head
     from cpb_outreach.sender import run_campaign_batch
 
     return run_campaign_batch(slug, limit=limit)
+
+
+@app.post("/internal/campaigns/{slug}/send-self-test")
+def send_self_test(
+    slug: str,
+    payload: SelfTestRequest,
+    x_api_key: str | None = Header(default=None),
+):
+    _verify_internal_key(x_api_key)
+    from cpb_outreach.sender import send_self_test as send_operator_self_test
+
+    return send_operator_self_test(
+        payload.email,
+        campaign_slug=slug,
+        contact_name=payload.contact_name,
+    )
 
 
 @app.post("/webhooks/resend")
